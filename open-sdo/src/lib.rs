@@ -15,6 +15,24 @@ pub mod client;
 /// SDO Server implementation
 pub mod server;
 
+pub mod abort;
+pub mod command;
+
+pub struct CanFrame {
+    can_id: u32,
+    dlc: u8,
+    data: [u8; 8],
+}
+impl CanFrame {
+    pub fn new(id: u32) -> Self {
+        Self {
+            can_id: id,
+            dlc: 0,
+            data: [0u8; 8],
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     #[test]
