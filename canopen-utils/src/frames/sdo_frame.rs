@@ -110,12 +110,33 @@ mod tests {
 
     #[test]
     fn into_sdo_as_service_check() {
-        let mut msg =
-            CANopenFrame::<8>::new(0x680, [0u8; 8]).expect("valid msg given - should not fail");
+        let msg =
+            CANopenFrame::<8>::new(0x601, [0u8; 8]).expect("valid msg given - should not fail");
 
-        if let Err(x) = SdoFrame::try_convert(msg) {
-            msg = x;
-        }
+        let o = match SdoFrame::try_convert(msg) {
+            Ok(_sdo) => {
+                // Works on SDO
+                (false, None)
+            }
+            Err(raw_frame) => (true, Some(raw_frame)),
+        };
+        assert_eq!((false, None), o);
         // do stuff with msg
+    }
+
+    #[test]
+    fn into_sdo_as_service_check_2() {
+        let msg =
+            CANopenFrame::<8>::new(0x082, [0u8; 8]).expect("valid msg given - should not fail");
+
+        let sdo_checked = match SdoFrame::try_convert(msg) {
+            Ok(_sdo) => {
+                // Works on SDO
+                (false, None)
+            }
+            Err(raw_frame) => (true, Some(raw_frame)),
+        };
+        assert_eq!(true, sdo_checked.0);
+        assert_eq!(true, sdo_checked.1.unwrap().is_emcy_msg());
     }
 }
