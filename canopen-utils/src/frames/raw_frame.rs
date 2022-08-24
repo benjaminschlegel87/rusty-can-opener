@@ -1,4 +1,4 @@
-use std::ops::RangeInclusive;
+use core::ops::RangeInclusive;
 
 pub const SDO_REQUIRED_DLC: usize = 8;
 pub const EMCY_REQUIRED_DLC: usize = 8;
@@ -11,8 +11,10 @@ pub const SDO_ID_RANGE: RangeInclusive<u16> = 0x581..=0x67F;
 pub const HB_ID_RANGE: RangeInclusive<u16> = 0x701..=0x77F;
 
 #[derive(Debug, PartialEq)]
-
+pub struct OwnershipMarker;
+#[derive(Debug, PartialEq)]
 pub struct CANopenFrame<const DLC: usize> {
+    marker: OwnershipMarker,
     cob_id: u16,
     data: [u8; DLC],
 }
@@ -32,7 +34,11 @@ macro_rules! ImplRawFrameApi {
                 } else {
                     // Safe because in this branch can_id is < 0x77F
                     let cob_id = can_id as u16;
-                    Some(Self { cob_id, data })
+                    Some(Self {
+                        marker: OwnershipMarker,
+                        cob_id,
+                        data,
+                    })
                 }
             }
             pub fn get_data(&self) -> &[u8] {
